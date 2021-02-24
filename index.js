@@ -6,8 +6,22 @@ app.get('/', (req, res) => {
 	res.json({ message: 'Welcome to API' });
 });
 
+// middle ware
+const authenticate = (req, res, next) => {
+	// Get auth header value
+	const bearer = req.headers['authorization'];
+	if (bearer) {
+		console.log(bearer);
+		req.token = bearer;
+		next();
+	} else {
+		res.json({ message: 'Forbidden' });
+	}
+	next();
+};
+
 // protected route
-app.post('/api/posts', (req, res) => {
+app.post('/api/posts', authenticate, (req, res) => {
 	res.json({ message: 'posts created...' });
 });
 
