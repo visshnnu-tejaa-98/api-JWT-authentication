@@ -22,7 +22,13 @@ const authenticate = (req, res, next) => {
 
 // protected route
 app.post('/api/posts', authenticate, (req, res) => {
-	res.json({ message: 'posts created...' });
+	jwt.verify(req.token, 'secret', (err, authData) => {
+		if (err) {
+			res.sendStatus(403);
+		} else {
+			res.json({ message: 'posts created...', authData });
+		}
+	});
 });
 
 app.post('/api/login', (req, res) => {
@@ -33,7 +39,8 @@ app.post('/api/login', (req, res) => {
 		email: 'visshnnu@gmail.com',
 	};
 	// doing asyncronously
-	jwt.sign({ user }, 'secret', (err, token) => {
+	jwt.sign({ user }, 'secret', { expiresIn: '15s' }, (err, token) => {
+		if (err) console.log(err);
 		res.json({ token });
 	});
 });
